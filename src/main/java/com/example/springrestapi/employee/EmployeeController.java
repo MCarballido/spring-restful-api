@@ -8,7 +8,6 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,15 +34,6 @@ public class EmployeeController {
         );
     }
 
-    @PostMapping("/employees")
-    ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
-        Employee entity = repository.save(employee);
-        EntityModel<Employee> entityModel = assembler.toModel(entity);
-        return ResponseEntity
-            .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-            .body(entityModel);
-    }
-
     @GetMapping("/employees/{id}")
     EntityModel<Employee> getEmployee(@PathVariable long id) {
         Employee employee = repository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
@@ -54,6 +44,15 @@ public class EmployeeController {
 //            linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees")
 //        );
         return assembler.toModel(employee);
+    }
+
+    @PostMapping("/employees")
+    ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
+        Employee entity = repository.save(employee);
+        EntityModel<Employee> entityModel = assembler.toModel(entity);
+        return ResponseEntity
+            .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+            .body(entityModel);
     }
 
     @PutMapping("/employees/{id}")
