@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Data
@@ -14,8 +15,8 @@ public class Order {
 
     private @Id @GeneratedValue Long id;
 
-    private String description;
-    private Status status;
+    private @NotNull String description;
+    private @NotNull Status status;
 
     public Order() {}
 

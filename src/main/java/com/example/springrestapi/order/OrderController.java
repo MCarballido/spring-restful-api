@@ -3,12 +3,12 @@ package com.example.springrestapi.order;
 import com.example.springrestapi.status.Status;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.mediatype.vnderrors.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +41,9 @@ public class OrderController {
 
     @GetMapping("/orders/{id}")
     EntityModel<Order> getOrder(@PathVariable long id) {
-        Order order = repository.findById(id).orElseThrow(null); // missing error class
+        Order order = repository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id"));
 
         return assembler.toModel(order);
     }
@@ -59,7 +61,9 @@ public class OrderController {
     @DeleteMapping("/orders/{id}/cancel")
 //  ResponseEntity<RepresentationModel> cancel(@PathVariable long id) {
     ResponseEntity<?> cancel(@PathVariable long id) {
-        Order order = repository.findById(id).orElseThrow(null);
+        Order order = repository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id"));
 
         if (order.getStatus() == Status.IN_PROGRESS) {
             order.setStatus(Status.CANCELLED);
@@ -76,7 +80,9 @@ public class OrderController {
 
     @PutMapping("/orders/{id}/complete")
     ResponseEntity<?> complete(@PathVariable long id) {
-        Order order = repository.findById(id).orElseThrow(null);
+        Order order = repository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id"));
 
         if (order.getStatus() == Status.IN_PROGRESS) {
             order.setStatus(Status.COMPLETED);

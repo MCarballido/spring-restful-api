@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
-public class GenericError {
+public class HttpErrorBody {
 
     private HttpStatus status;
     private LocalDateTime timestamp;
@@ -12,23 +12,23 @@ public class GenericError {
     private String debugMessage;
 //    private List<> subErrors;
 
-    private GenericError() {
+    public HttpErrorBody() {
         timestamp = LocalDateTime.now();
     }
 
-    GenericError(HttpStatus status) {
+    public HttpErrorBody(HttpStatus status) {
         this();
         this.status = status;
     }
 
-    GenericError(HttpStatus status, Throwable ex) {
+    public HttpErrorBody(HttpStatus status, Throwable ex) {
         this();
         this.status = status;
         this.message = "Unexpected error";
         this.debugMessage = ex.getLocalizedMessage();
     }
 
-    GenericError(HttpStatus status, String message, Throwable ex) {
+    public HttpErrorBody(HttpStatus status, String message, Throwable ex) {
         this();
         this.status = status;
         this.message = message;

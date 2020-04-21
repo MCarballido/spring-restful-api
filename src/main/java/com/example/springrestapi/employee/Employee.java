@@ -5,14 +5,15 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+
 
 @Data
 @Entity
 public class Employee {
     private @Id @GeneratedValue long id;
-
-    private String name;
-    private String role;
+    private @NotNull String name;
+    private @NotNull String role;
 
     public Employee() {}
 

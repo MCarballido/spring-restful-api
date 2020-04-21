@@ -8,6 +8,7 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,13 +37,10 @@ public class EmployeeController {
 
     @GetMapping("/employees/{id}")
     EntityModel<Employee> getEmployee(@PathVariable long id) {
-        Employee employee = repository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
+        Employee employee = repository
+            .findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Employee for the provided id"));
 
-//        return new EntityModel<>(
-//            employee,
-//            linkTo(methodOn(EmployeeController.class).getEmployee(id)).withSelfRel(),
-//            linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees")
-//        );
         return assembler.toModel(employee);
     }
 
