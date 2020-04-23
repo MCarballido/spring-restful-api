@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/api/v1")
 public class EmployeeController {
 
     private final EmployeeRepository repository;
@@ -48,6 +49,7 @@ public class EmployeeController {
     ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
         Employee entity = repository.save(employee);
         EntityModel<Employee> entityModel = assembler.toModel(entity);
+
         return ResponseEntity
             .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
             .body(entityModel);

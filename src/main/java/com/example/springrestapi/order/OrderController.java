@@ -16,6 +16,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping("/api/v1")
 public class OrderController {
 
     private final OrderRepository repository;
@@ -28,7 +29,6 @@ public class OrderController {
 
     @GetMapping("/orders")
     CollectionModel<EntityModel<Order>> getAllOrders() {
-
         List<EntityModel<Order>> orders = repository.findAll().stream()
             .map(assembler::toModel)
             .collect(Collectors.toList());
