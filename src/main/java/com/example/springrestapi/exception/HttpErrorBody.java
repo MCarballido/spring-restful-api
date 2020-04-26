@@ -1,19 +1,24 @@
-package com.example.springrestapi.global;
+package com.example.springrestapi.exception;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
+@Data
 public class HttpErrorBody {
 
     private HttpStatus status;
     private LocalDateTime timestamp;
     private String message;
     private String debugMessage;
-//    private List<> subErrors;
+    private List<String> details;
 
     public HttpErrorBody() {
         timestamp = LocalDateTime.now();
+        details = new LinkedList<>();
     }
 
     public HttpErrorBody(HttpStatus status) {
@@ -35,35 +40,11 @@ public class HttpErrorBody {
         this.debugMessage = ex.getLocalizedMessage();
     }
 
-    public HttpStatus getStatus() {
-        return status;
+    public void addSubError(String subError) {
+        this.details.add(subError);
     }
 
-    public void setStatus(HttpStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getDebugMessage() {
-        return debugMessage;
-    }
-
-    public void setDebugMessage(String debugMessage) {
-        this.debugMessage = debugMessage;
+    public void removeSubError(String subError) {
+        this.details.remove(subError);
     }
 }

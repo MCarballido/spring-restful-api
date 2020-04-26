@@ -7,7 +7,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmployeeModelAssembler implements RepresentationModelAssembler<Employee, EntityModel<Employee>> {
+public class EmployeeAssembler implements RepresentationModelAssembler<Employee, EntityModel<Employee>> {
 
     /***
      * It converts a non-recourse object into a resource-based object (EntityModel<obj>)

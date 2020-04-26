@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +18,9 @@ import java.util.stream.Collectors;
 public class EmployeeController {
 
     private final EmployeeRepository repository;
-    private final EmployeeModelAssembler assembler;
+    private final EmployeeAssembler assembler;
 
-    public EmployeeController(EmployeeRepository repository, EmployeeModelAssembler assembler) {
+    public EmployeeController(EmployeeRepository repository, EmployeeAssembler assembler) {
         this.repository = repository;
         this.assembler = assembler;
     }
@@ -40,13 +41,14 @@ public class EmployeeController {
     EntityModel<Employee> getEmployee(@PathVariable long id) {
         Employee employee = repository
             .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Employee for the provided id"));
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Employee for the provided ID."));
 
         return assembler.toModel(employee);
     }
 
     @PostMapping("/employees")
-    ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
+    ResponseEntity<?> createEmployee(@Valid @RequestBody Employee employee) {
+
         Employee entity = repository.save(employee);
         EntityModel<Employee> entityModel = assembler.toModel(entity);
 
@@ -71,7 +73,7 @@ public class EmployeeController {
         EntityModel<Employee> entityModel = assembler.toModel(updatedEmployee);
 
         return ResponseEntity
-            .accepted()
+            .ok()
             .location(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
             .body(entityModel);
     }
@@ -80,6 +82,6 @@ public class EmployeeController {
     ResponseEntity<?> deleteEmployee(@PathVariable long id) {
         repository.deleteById(id);
 
-        return  ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

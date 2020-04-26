@@ -1,5 +1,9 @@
 package com.example.springrestapi.order;
 
+import com.example.springrestapi.customer.Customer;
+import com.example.springrestapi.customer.CustomerRepository;
+import com.example.springrestapi.employee.Employee;
+import com.example.springrestapi.employee.EmployeeRepository;
 import com.example.springrestapi.status.Status;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -9,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +24,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/v1")
 public class OrderController {
 
+    private final CustomerRepository customerRepository;
+    private final EmployeeRepository employeeRepository;
     private final OrderRepository repository;
-    private final OrderModelAssembler assembler;
+    private final OrderAssembler assembler;
 
-    public OrderController(OrderRepository repository, OrderModelAssembler assembler) {
+    public OrderController(CustomerRepository customerRepository, EmployeeRepository employeeRepository, OrderRepository repository, OrderAssembler assembler) {
+        this.customerRepository = customerRepository;
+        this.employeeRepository = employeeRepository;
         this.repository = repository;
         this.assembler = assembler;
     }
@@ -43,14 +52,24 @@ public class OrderController {
     EntityModel<Order> getOrder(@PathVariable long id) {
         Order order = repository
             .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id"));
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided ID."));
 
         return assembler.toModel(order);
     }
 
     @PostMapping("/orders")
-    ResponseEntity<EntityModel<Order>> createOrder(@RequestBody Order order) {
+    ResponseEntity<EntityModel<Order>> createOrder(@Valid @RequestBody Order order) {
+        Employee employee = employeeRepository
+            .findById(order.getEmployee().getId())
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Employee for the provided ID."));
+        Customer customer = customerRepository
+            .findById(order.getCustomer().getId())
+            .orElseThrow(() -> new EntityNotFoundException("Could not find a Customer for the provided ID."));
+
+        order.setEmployee(employee);
+        order.setCustomer(customer);
         order.setStatus(Status.IN_PROGRESS);
+
         Order newOrder = repository.save(order);
 
         return ResponseEntity
@@ -59,11 +78,10 @@ public class OrderController {
     }
 
     @DeleteMapping("/orders/{id}/cancel")
-//  ResponseEntity<RepresentationModel> cancel(@PathVariable long id) {
     ResponseEntity<?> cancel(@PathVariable long id) {
         Order order = repository
             .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id"));
+            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id."));
 
         if (order.getStatus() == Status.IN_PROGRESS) {
             order.setStatus(Status.CANCELLED);

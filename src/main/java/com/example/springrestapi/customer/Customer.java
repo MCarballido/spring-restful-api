@@ -1,4 +1,4 @@
-package com.example.springrestapi.employee;
+package com.example.springrestapi.customer;
 
 import lombok.Data;
 
@@ -8,8 +8,8 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@Table(name = "Employees")
-public class Employee {
+@Table(name = "Customers")
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -19,14 +19,9 @@ public class Employee {
     @NotBlank(message = "The name cannot be empty.")
     private String name;
 
-    @NotNull(message = "The role cannot be null.")
-    @NotBlank(message = "The role cannot be empty.")
-    private String role;
+    public Customer() {}
 
-    protected Employee() {}
-
-    public Employee(String name, String role) {
+    public Customer(String name) {
         this.name = name;
-        this.role = role;
     }
 }
