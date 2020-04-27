@@ -17,17 +17,20 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1")
 public class EmployeeController {
 
-    private final EmployeeRepository repository;
     private final EmployeeAssembler assembler;
+    private final EmployeeService service;
 
-    public EmployeeController(EmployeeRepository repository, EmployeeAssembler assembler) {
-        this.repository = repository;
+    public EmployeeController(EmployeeAssembler assembler, EmployeeService service) {
         this.assembler = assembler;
+        this.service = service;
     }
 
     @GetMapping("/employees")
     CollectionModel<EntityModel<Employee>> getAllEmployees() {
-        List<EntityModel<Employee>> employees = repository.findAll().stream()
+        List<Employee> emps = service.getAllEmployees();
+
+        List<EntityModel<Employee>> employees = emps
+            .stream()
             .map(assembler::toModel)
             .collect(Collectors.toList());
 
@@ -39,9 +42,7 @@ public class EmployeeController {
 
     @GetMapping("/employees/{id}")
     EntityModel<Employee> getEmployee(@PathVariable long id) {
-        Employee employee = repository
-            .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Employee for the provided ID."));
+        Employee employee = service.getEmployee(id);
 
         return assembler.toModel(employee);
     }
@@ -49,7 +50,7 @@ public class EmployeeController {
     @PostMapping("/employees")
     ResponseEntity<?> createEmployee(@Valid @RequestBody Employee employee) {
 
-        Employee entity = repository.save(employee);
+        Employee entity = service.createEmployee(employee);
         EntityModel<Employee> entityModel = assembler.toModel(entity);
 
         return ResponseEntity
@@ -59,16 +60,7 @@ public class EmployeeController {
 
     @PutMapping("/employees/{id}")
     ResponseEntity<?> updateEmployee(@RequestBody Employee employee, @PathVariable long id) {
-        Employee updatedEmployee = repository.findById(id)
-            .map(emp -> {
-                emp.setName(employee.getName());
-                emp.setRole(employee.getRole());
-                return repository.save(emp);
-            })
-            .orElseGet(() -> {
-                employee.setId(id);
-                return repository.save(employee);
-            });
+        Employee updatedEmployee = service.updateEmployee(employee, id);
 
         EntityModel<Employee> entityModel = assembler.toModel(updatedEmployee);
 
@@ -80,7 +72,7 @@ public class EmployeeController {
 
     @DeleteMapping("/employees/{id}")
     ResponseEntity<?> deleteEmployee(@PathVariable long id) {
-        repository.deleteById(id);
+        service.deleteEmployee(id);
 
         return ResponseEntity.ok().build();
     }

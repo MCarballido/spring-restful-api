@@ -27,12 +27,12 @@ public class Order {
     private Status status = Status.IN_PROGRESS;
 
     @NotNull(message = "The employee cannot be null.")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "employee_id_fk"))
     private Employee employee;
 
     @NotNull(message = "The customer cannot be null.")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "customer_id_fk"))
     private Customer customer;
 

@@ -24,21 +24,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/v1")
 public class OrderController {
 
-    private final CustomerRepository customerRepository;
-    private final EmployeeRepository employeeRepository;
     private final OrderRepository repository;
     private final OrderAssembler assembler;
+    private final OrderService service;
 
-    public OrderController(CustomerRepository customerRepository, EmployeeRepository employeeRepository, OrderRepository repository, OrderAssembler assembler) {
-        this.customerRepository = customerRepository;
-        this.employeeRepository = employeeRepository;
+    public OrderController(OrderRepository repository, OrderAssembler assembler, OrderService service) {
         this.repository = repository;
         this.assembler = assembler;
+        this.service = service;
     }
 
     @GetMapping("/orders")
     CollectionModel<EntityModel<Order>> getAllOrders() {
-        List<EntityModel<Order>> orders = repository.findAll().stream()
+        List<EntityModel<Order>> orders = service.getAllOrders().stream()
             .map(assembler::toModel)
             .collect(Collectors.toList());
 
@@ -50,27 +48,14 @@ public class OrderController {
 
     @GetMapping("/orders/{id}")
     EntityModel<Order> getOrder(@PathVariable long id) {
-        Order order = repository
-            .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided ID."));
+        Order order = service.getOrder(id);
 
         return assembler.toModel(order);
     }
 
     @PostMapping("/orders")
     ResponseEntity<EntityModel<Order>> createOrder(@Valid @RequestBody Order order) {
-        Employee employee = employeeRepository
-            .findById(order.getEmployee().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Employee for the provided ID."));
-        Customer customer = customerRepository
-            .findById(order.getCustomer().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Could not find a Customer for the provided ID."));
-
-        order.setEmployee(employee);
-        order.setCustomer(customer);
-        order.setStatus(Status.IN_PROGRESS);
-
-        Order newOrder = repository.save(order);
+        Order newOrder = service.createOrder(order);
 
         return ResponseEntity
             .created(linkTo(methodOn(OrderController.class).getOrder(newOrder.getId())).toUri())
@@ -79,40 +64,23 @@ public class OrderController {
 
     @DeleteMapping("/orders/{id}/cancel")
     ResponseEntity<?> cancel(@PathVariable long id) {
-        Order order = repository
-            .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id."));
+        Order entity = service.cancel(id);
 
-        if (order.getStatus() == Status.IN_PROGRESS) {
-            order.setStatus(Status.CANCELLED);
-            return ResponseEntity.ok(assembler.toModel(repository.save(order)));
-        }
-
-        return ResponseEntity
-            .status(HttpStatus.METHOD_NOT_ALLOWED)
-            .body(new VndErrors.VndError(
-                "Method not allowed",
-                "You can't cancel an order that is in the " + order.getStatus() + " status."
-            ));
+        return ResponseEntity.ok(assembler.toModel(entity));
     }
 
     @PutMapping("/orders/{id}/complete")
     ResponseEntity<?> complete(@PathVariable long id) {
-        Order order = repository
-            .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find an Order for the provided id"));
+        Order entity = service.complete(id);
 
-        if (order.getStatus() == Status.IN_PROGRESS) {
-            order.setStatus(Status.COMPLETED);
-            return ResponseEntity.ok(assembler.toModel(repository.save(order)));
-        }
+        return ResponseEntity.ok(assembler.toModel(entity));
 
-        return ResponseEntity
-            .status(HttpStatus.METHOD_NOT_ALLOWED)
-            .body(new VndErrors.VndError(
-                "Method not allowed",
-                "You can't cancel an order that is in the " + order.getStatus() + " status"
-            ));
+//        return ResponseEntity
+//            .status(HttpStatus.METHOD_NOT_ALLOWED)
+//            .body(new VndErrors.VndError(
+//                "Method not allowed",
+//                "You can't cancel an order that is in the " + order.getStatus() + " status"
+//            ));
     }
 
 }

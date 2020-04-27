@@ -18,31 +18,32 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/v1")
 public class CustomerController {
 
-    private final CustomerRepository repository;
     private final CustomerAssembler assembler;
+    private final CustomerService service;
 
-    public CustomerController(CustomerRepository repository, CustomerAssembler assembler) {
-        this.repository = repository;
+    public CustomerController(CustomerAssembler assembler, CustomerService service) {
         this.assembler = assembler;
+        this.service = service;
     }
 
     @GetMapping("/customers")
     CollectionModel<EntityModel<Customer>> getAllCustomers() {
-        List<EntityModel<Customer>> customers = repository.findAll().stream()
+
+        List<Customer> customers = service.getAllCustomers();
+
+        List<EntityModel<Customer>> customerEntityModels = customers.stream()
             .map(assembler::toModel)
             .collect(Collectors.toList());
 
         return new CollectionModel<>(
-            customers,
+            customerEntityModels,
             linkTo(methodOn(CustomerController.class).getAllCustomers()).withSelfRel()
         );
     }
 
     @GetMapping("/customers/{id}")
     EntityModel<Customer> getCustomer(@PathVariable long id) {
-        Customer customer = repository
-            .findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Could not find a Customer for the provided ID."));
+        Customer customer = service.getCustomer(id);
 
         return assembler.toModel(customer);
     }
@@ -50,7 +51,7 @@ public class CustomerController {
     @PostMapping("/customers")
     ResponseEntity<?> createCustomer(@Valid @RequestBody Customer customer) {
 
-        Customer entity = repository.save(customer);
+        Customer entity = service.createCustomer(customer);
         EntityModel<Customer> entityModel = assembler.toModel(entity);
 
         return ResponseEntity
@@ -60,18 +61,9 @@ public class CustomerController {
 
     @PutMapping("/customers/{id}")
     ResponseEntity<?> updateCustomer(@Valid @RequestBody Customer customer, @PathVariable long id) {
-        Customer updatedCustomer = repository
-            .findById(id)
-            .map(entity -> {
-                entity.setName(customer.getName());
-                return repository.save(entity);
-            })
-            .orElseGet(() -> {
-                customer.setId(id);
-                return repository.save(customer);
-            });
+        Customer entity = service.updateCustomer(customer, id);
 
-        EntityModel<Customer> entityModel = assembler.toModel(updatedCustomer);
+        EntityModel<Customer> entityModel = assembler.toModel(entity);
 
         return ResponseEntity
             .ok()
@@ -81,7 +73,7 @@ public class CustomerController {
 
     @DeleteMapping("/customers/{id}")
     ResponseEntity<?> deleteCustomer(@PathVariable long id) {
-        repository.deleteById(id);
+        service.deleteCustomer(id);
 
         return ResponseEntity.ok().build();
     }
