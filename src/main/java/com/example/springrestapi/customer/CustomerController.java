@@ -49,7 +49,6 @@ public class CustomerController {
 
     @PostMapping("/customers")
     ResponseEntity<?> createCustomer(@Valid @RequestBody Customer customer) {
-
         Customer entity = service.createCustomer(customer);
         EntityModel<Customer> entityModel = assembler.toModel(entity);
 
@@ -74,7 +73,7 @@ public class CustomerController {
     ResponseEntity<?> deleteCustomer(@PathVariable long id) {
         service.deleteCustomer(id);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

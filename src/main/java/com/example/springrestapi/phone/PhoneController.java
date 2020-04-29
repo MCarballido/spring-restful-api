@@ -1,10 +1,18 @@
 package com.example.springrestapi.phone;
 
+import com.example.springrestapi.customer.Customer;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -19,8 +27,53 @@ public class PhoneController {
     }
 
     @GetMapping("/employees/{employeeId}/phones")
-    public List<Phone> getPhonesByEmployee(@PathVariable long employeeId) {
-        List<Phone> phones = service.getPhonesByEmployee(employeeId);
-        return phones;
+    public CollectionModel<EntityModel<Phone>> getAllPhones(@PathVariable long employeeId) {
+        List<Phone> phones = service.getAllPhones(employeeId);
+
+        List<EntityModel<Phone>> phonesEntities = phones
+            .stream()
+            .map(assembler::toModel)
+            .collect(Collectors.toList());
+
+        return new CollectionModel<>(
+            phonesEntities,
+            linkTo(methodOn(PhoneController.class).getAllPhones(employeeId)).withSelfRel()
+        );
+    }
+
+    @GetMapping("/employees/{employeeId}/phones/{id}")
+    public EntityModel<Phone> getPhone(@PathVariable long employeeId, @PathVariable long id) {
+        Phone phone = service.getPhone(employeeId, id);
+
+        return assembler.toModel(phone);
+    }
+
+    @PostMapping("/employees/{employeeId}/phones")
+    public ResponseEntity<?> createPhone(@RequestBody Phone phone, @PathVariable long employeeId) {
+        Phone createdPhone = service.createPhone(employeeId, phone);
+        EntityModel<Phone> phoneEntityModel = assembler.toModel(createdPhone);
+
+        return ResponseEntity
+            .created(phoneEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+            .body(phoneEntityModel);
+    }
+
+    @PutMapping("/employees/{employeeId}/phones/{id}")
+    ResponseEntity<?> updatePhone(@RequestBody Phone phone, @PathVariable long employeeId, @PathVariable long id) {
+        Phone entity = service.updatePhone(employeeId, id, phone);
+
+        EntityModel<Phone> entityModel = assembler.toModel(entity);
+
+        return ResponseEntity
+            .ok()
+            .location(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+            .body(entityModel);
+    }
+
+    @DeleteMapping("/employees/{employeeId}/phones/{id}")
+    ResponseEntity<?> deletePhone(@PathVariable long employeeId, @PathVariable long id) {
+        service.deletePhone(employeeId, id);
+
+        return ResponseEntity.noContent().build();
     }
 }

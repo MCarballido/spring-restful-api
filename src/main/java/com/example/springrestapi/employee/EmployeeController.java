@@ -73,6 +73,6 @@ public class EmployeeController {
     ResponseEntity<?> deleteEmployee(@PathVariable long id) {
         service.deleteEmployee(id);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

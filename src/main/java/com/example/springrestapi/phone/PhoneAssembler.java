@@ -12,7 +12,9 @@ public class PhoneAssembler implements RepresentationModelAssembler<Phone, Entit
     @Override
     public EntityModel<Phone> toModel(Phone phone) {
         return new EntityModel<>(
-            phone
+            phone,
+            linkTo(methodOn(PhoneController.class).getPhone(phone.getEmployee().getId(), phone.getId())).withSelfRel(),
+            linkTo(methodOn(PhoneController.class).getAllPhones(phone.getEmployee().getId())).withRel("phones")
         );
     }
 }

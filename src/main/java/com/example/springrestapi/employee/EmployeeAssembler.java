@@ -2,6 +2,7 @@ package com.example.springrestapi.employee;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import com.example.springrestapi.phone.PhoneController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,8 @@ public class EmployeeAssembler implements RepresentationModelAssembler<Employee,
         return new EntityModel<>(
             employee,
             linkTo(methodOn(EmployeeController.class).getEmployee(employee.getId())).withSelfRel(),
-            linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees")
+            linkTo(methodOn(EmployeeController.class).getAllEmployees()).withRel("employees"),
+            linkTo(methodOn(PhoneController.class).getAllPhones(employee.getId())).withRel("phones")
         );
     }
 }
