@@ -19,22 +19,15 @@ public class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
-    public List<Phone> getAllPhones(long id) {
-        List<Phone> phones = repository.findByEmployeeId(id);
-        return phones;
+    public List<Phone> getPhonesByEmployee(long id) {
+        return repository.findByEmployeeId(id);
     }
 
     @Override
-    public Phone getPhone(long employeeId, long id) {
-        Phone phone = repository.findById(id).orElseThrow(() ->
+    public Phone getPhone(long id) {
+        return repository.findById(id).orElseThrow(() ->
             new EntityNotFoundException("Could not find a phone for the provided ID.")
         );
-
-        if (phone.getEmployee().getId() != employeeId) {
-            throw new IllegalArgumentException("Could not find an employee for the provided ID.");
-        }
-
-        return phone;
     }
 
     @Override
@@ -49,21 +42,18 @@ public class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
-    public Phone updatePhone(long employeeId, long id, Phone phone) {
-        return repository
-            .findById(id)
-            .map(entity -> {
-                entity.setNumber(phone.getNumber());
-                return repository.save(entity);
-            })
-            .orElseGet(() -> {
-                phone.setId(id);
-                return repository.save(phone);
-            });
-    } // missing verify employeeId
+    public Phone updatePhone(long id, Phone phone) {
+        Phone entity = repository.findById(id).orElseThrow(() ->
+            new EntityNotFoundException("Could not find a phone for the provided ID.")
+        );
+
+        entity.setNumber(phone.getNumber());
+
+        return repository.save(entity);
+    }
 
     @Override
-    public void deletePhone(long employeeId, long id) {
+    public void deletePhone(long id) {
         repository.deleteById(id);
     }
 

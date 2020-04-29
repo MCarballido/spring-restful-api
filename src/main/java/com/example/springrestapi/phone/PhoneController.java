@@ -1,6 +1,5 @@
 package com.example.springrestapi.phone;
 
-import com.example.springrestapi.customer.Customer;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -27,8 +26,8 @@ public class PhoneController {
     }
 
     @GetMapping("/employees/{employeeId}/phones")
-    public CollectionModel<EntityModel<Phone>> getAllPhones(@PathVariable long employeeId) {
-        List<Phone> phones = service.getAllPhones(employeeId);
+    public CollectionModel<EntityModel<Phone>> getPhonesByEmployee(@PathVariable long employeeId) {
+        List<Phone> phones = service.getPhonesByEmployee(employeeId);
 
         List<EntityModel<Phone>> phonesEntities = phones
             .stream()
@@ -37,19 +36,19 @@ public class PhoneController {
 
         return new CollectionModel<>(
             phonesEntities,
-            linkTo(methodOn(PhoneController.class).getAllPhones(employeeId)).withSelfRel()
+            linkTo(methodOn(PhoneController.class).getPhonesByEmployee(employeeId)).withSelfRel()
         );
     }
 
     @GetMapping("/employees/{employeeId}/phones/{id}")
-    public EntityModel<Phone> getPhone(@PathVariable long employeeId, @PathVariable long id) {
-        Phone phone = service.getPhone(employeeId, id);
+    public EntityModel<Phone> getPhone(@PathVariable long id, @PathVariable long employeeId) {
+        Phone phone = service.getPhone(id);
 
         return assembler.toModel(phone);
     }
 
     @PostMapping("/employees/{employeeId}/phones")
-    public ResponseEntity<?> createPhone(@RequestBody Phone phone, @PathVariable long employeeId) {
+    public ResponseEntity<?> createPhone(@Valid @RequestBody Phone phone, @PathVariable long employeeId) {
         Phone createdPhone = service.createPhone(employeeId, phone);
         EntityModel<Phone> phoneEntityModel = assembler.toModel(createdPhone);
 
@@ -59,8 +58,8 @@ public class PhoneController {
     }
 
     @PutMapping("/employees/{employeeId}/phones/{id}")
-    ResponseEntity<?> updatePhone(@RequestBody Phone phone, @PathVariable long employeeId, @PathVariable long id) {
-        Phone entity = service.updatePhone(employeeId, id, phone);
+    ResponseEntity<?> updatePhone(@Valid @RequestBody Phone phone, @PathVariable long id, @PathVariable long employeeId) {
+        Phone entity = service.updatePhone(id, phone);
 
         EntityModel<Phone> entityModel = assembler.toModel(entity);
 
@@ -71,8 +70,8 @@ public class PhoneController {
     }
 
     @DeleteMapping("/employees/{employeeId}/phones/{id}")
-    ResponseEntity<?> deletePhone(@PathVariable long employeeId, @PathVariable long id) {
-        service.deletePhone(employeeId, id);
+    ResponseEntity<?> deletePhone(@PathVariable long id, @PathVariable long employeeId) {
+        service.deletePhone(id);
 
         return ResponseEntity.noContent().build();
     }

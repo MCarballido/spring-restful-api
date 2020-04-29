@@ -47,4 +47,9 @@ public class Employee {
         phone.setEmployee(null);
         phones.remove(phone);
     }
+
+    @Override
+    public String toString() {
+        return "Employee: { Name: " + this.name + ", Role: " + this.role + " }";
+    }
 }
