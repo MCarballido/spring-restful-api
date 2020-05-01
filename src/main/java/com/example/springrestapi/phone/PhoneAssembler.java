@@ -13,7 +13,7 @@ public class PhoneAssembler implements RepresentationModelAssembler<Phone, Entit
     public EntityModel<Phone> toModel(Phone phone) {
         return new EntityModel<>(
             phone,
-            linkTo(methodOn(PhoneController.class).getPhone(phone.getId(), phone.getEmployee().getId())).withSelfRel(),
+            linkTo(methodOn(PhoneController.class).getPhone(phone.getId())).withSelfRel(),
             linkTo(methodOn(PhoneController.class).getPhonesByEmployee(phone.getEmployee().getId())).withRel("phones")
         );
     }

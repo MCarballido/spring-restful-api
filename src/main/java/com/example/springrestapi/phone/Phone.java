@@ -2,7 +2,6 @@ package com.example.springrestapi.phone;
 
 import com.example.springrestapi.employee.Employee;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,7 +22,7 @@ public class Phone {
     @NotBlank(message = "The number cannot be empty.")
     private String number;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JsonBackReference
     private Employee employee;
 

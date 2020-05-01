@@ -40,15 +40,15 @@ public class PhoneController {
         );
     }
 
-    @GetMapping("/employees/{employeeId}/phones/{id}")
-    public EntityModel<Phone> getPhone(@PathVariable long id, @PathVariable long employeeId) {
+    @GetMapping("/phones/{id}")
+    public EntityModel<Phone> getPhone(@PathVariable long id) {
         Phone phone = service.getPhone(id);
 
         return assembler.toModel(phone);
     }
 
     @PostMapping("/employees/{employeeId}/phones")
-    public ResponseEntity<?> createPhone(@Valid @RequestBody Phone phone, @PathVariable long employeeId) {
+    public ResponseEntity<?> createPhone(@RequestBody Phone phone, @PathVariable long employeeId) {
         Phone createdPhone = service.createPhone(employeeId, phone);
         EntityModel<Phone> phoneEntityModel = assembler.toModel(createdPhone);
 
@@ -57,8 +57,8 @@ public class PhoneController {
             .body(phoneEntityModel);
     }
 
-    @PutMapping("/employees/{employeeId}/phones/{id}")
-    ResponseEntity<?> updatePhone(@Valid @RequestBody Phone phone, @PathVariable long id, @PathVariable long employeeId) {
+    @PutMapping("/phones/{id}")
+    ResponseEntity<?> updatePhone(@Valid @RequestBody Phone phone, @PathVariable long id) {
         Phone entity = service.updatePhone(id, phone);
 
         EntityModel<Phone> entityModel = assembler.toModel(entity);
@@ -69,8 +69,8 @@ public class PhoneController {
             .body(entityModel);
     }
 
-    @DeleteMapping("/employees/{employeeId}/phones/{id}")
-    ResponseEntity<?> deletePhone(@PathVariable long id, @PathVariable long employeeId) {
+    @DeleteMapping("/phones/{id}")
+    ResponseEntity<?> deletePhone(@PathVariable long id) {
         service.deletePhone(id);
 
         return ResponseEntity.noContent().build();

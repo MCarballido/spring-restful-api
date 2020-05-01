@@ -5,6 +5,7 @@ import com.example.springrestapi.employee.Employee;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.util.List;
 
 @Service
@@ -15,7 +16,7 @@ public class PhoneServiceImpl implements PhoneService {
 
     public PhoneServiceImpl(PhoneRepository repository, EmployeeRepository employeeRepository) {
         this.repository = repository;
-        this.employeeRepository = employeeRepository; 
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -31,9 +32,9 @@ public class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
-    public Phone createPhone(long employeeId, Phone phone) {
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> 
-            new EntityNotFoundException("Could not find an employee for the provided ID.")    
+    public Phone createPhone(long employeeId, @Valid Phone phone) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
+            new EntityNotFoundException("Could not find an employee for the provided ID.")
         );
 
         phone.setEmployee(employee);

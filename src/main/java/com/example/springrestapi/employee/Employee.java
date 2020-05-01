@@ -27,7 +27,7 @@ public class Employee {
     @NotBlank(message = "The role cannot be empty.")
     private String role;
 
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY , cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL )
     @JsonManagedReference
     private List<Phone> phones = new ArrayList<>();
 

@@ -2,15 +2,12 @@ package com.example.springrestapi.order;
 
 import com.example.springrestapi.customer.Customer;
 import com.example.springrestapi.employee.Employee;
-import com.example.springrestapi.phone.Phone;
 import com.example.springrestapi.status.Status;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Entity
