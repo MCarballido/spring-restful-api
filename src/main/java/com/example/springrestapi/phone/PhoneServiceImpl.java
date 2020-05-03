@@ -43,7 +43,7 @@ public class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
-    public Phone updatePhone(long id, Phone phone) {
+    public Phone updatePhone(Phone phone, long id) {
         Phone entity = repository.findById(id).orElseThrow(() ->
             new EntityNotFoundException("Could not find a phone for the provided ID.")
         );

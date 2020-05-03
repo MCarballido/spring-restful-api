@@ -59,7 +59,7 @@ public class PhoneController {
 
     @PutMapping("/phones/{id}")
     ResponseEntity<?> updatePhone(@Valid @RequestBody Phone phone, @PathVariable long id) {
-        Phone entity = service.updatePhone(id, phone);
+        Phone entity = service.updatePhone(phone, id);
 
         EntityModel<Phone> entityModel = assembler.toModel(entity);
 

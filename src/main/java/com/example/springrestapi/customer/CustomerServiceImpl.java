@@ -22,7 +22,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer getCustomer(long id) {
         return repository.findById(id).orElseThrow(() ->
-            new EntityNotFoundException("Could not find a Customer for the provided ID."
+            new EntityNotFoundException("Could not find a customer for the provided ID."
         ));
     }
 
@@ -33,16 +33,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer updateCustomer(Customer customer, long id) {
-        return repository
-            .findById(id)
-            .map(entity -> {
-                entity.setName(customer.getName());
-                return repository.save(entity);
-            })
-            .orElseGet(() -> {
-                customer.setId(id);
-                return repository.save(customer);
-            });
+        Customer cus = repository.findById(id).orElseThrow(() ->
+            new EntityNotFoundException("Could not find a customer for the provided ID.")
+        );
+
+        cus.setName(customer.getName());
+
+        return repository.save(cus);
     }
 
     @Override

@@ -24,7 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return repository
             .findById(id)
             .orElseThrow(() ->
-                new EntityNotFoundException("Could not find an Employee for the provided ID.")
+                new EntityNotFoundException("Could not find an employee for the provided ID.")
             );
     }
 
@@ -35,16 +35,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee updateEmployee(Employee employee, long id) {
-        return repository.findById(id)
-            .map(emp -> {
-                emp.setName(employee.getName());
-                emp.setRole(employee.getRole());
-                return repository.save(emp);
-            })
-            .orElseGet(() -> {
-                employee.setId(id);
-                return repository.save(employee);
-            });
+        Employee emp = repository.findById(id).orElseThrow(() ->
+            new EntityNotFoundException("Could not find an employee for the provided ID.")
+        );
+
+        emp.setName(employee.getName());
+        emp.setRole(employee.getRole());
+
+        return repository.save(emp);
     }
 
     @Override
