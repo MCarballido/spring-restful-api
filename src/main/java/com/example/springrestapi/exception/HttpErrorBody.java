@@ -13,7 +13,6 @@ public class HttpErrorBody {
     private HttpStatus status;
     private LocalDateTime timestamp;
     private String message;
-    private String debugMessage;
     private List<String> details;
 
     public HttpErrorBody() {
@@ -26,25 +25,17 @@ public class HttpErrorBody {
         this.status = status;
     }
 
-    public HttpErrorBody(HttpStatus status, Throwable ex) {
-        this();
-        this.status = status;
-        this.message = "Unexpected error";
-        this.debugMessage = ex.getLocalizedMessage();
-    }
-
-    public HttpErrorBody(HttpStatus status, String message, Throwable ex) {
+    public HttpErrorBody(HttpStatus status, String message) {
         this();
         this.status = status;
         this.message = message;
-        this.debugMessage = ex.getLocalizedMessage();
     }
 
-    public void addSubError(String subError) {
-        this.details.add(subError);
+    public void addDetail(String detail) {
+        this.details.add(detail);
     }
 
-    public void removeSubError(String subError) {
-        this.details.remove(subError);
+    public void removeDetail(String detail) {
+        this.details.remove(detail);
     }
 }
