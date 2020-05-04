@@ -13,9 +13,10 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
+
 @ControllerAdvice
 public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
-//public class GlobalControllerAdvice {
 
     @Override
     public ResponseEntity<Object> handleHttpMessageNotReadable(
@@ -56,25 +57,16 @@ public class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
+        HttpErrorBody httpErrorBody = new HttpErrorBody(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
+        return buildResponseEntity(httpErrorBody);
+    }
+
+    @ExceptionHandler
     public ResponseEntity<Object> handleException(RuntimeException ex) {
         HttpErrorBody httpErrorBody = new HttpErrorBody(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage());
         return buildResponseEntity(httpErrorBody);
     }
-
-//    @ExceptionHandler
-//    public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
-//        HttpErrorBody httpErrorBody = new HttpErrorBody(HttpStatus.NOT_FOUND, ex);
-//        return buildResponseEntity(httpErrorBody);
-//    }
-//
-//    @ExceptionHandler
-//    public ResponseEntity<Object> handleInvalidMethodData(MethodArgumentNotValidException ex) {
-//        HttpErrorBody httpErrorBody = new HttpErrorBody(HttpStatus.BAD_REQUEST, ex);
-//        ex.getBindingResult().getAllErrors().forEach(error -> {
-//            httpErrorBody.addSubError(error.getDefaultMessage());
-//        });
-//        return buildResponseEntity(httpErrorBody);
-//    }
 
     private ResponseEntity<Object> buildResponseEntity(HttpErrorBody httpErrorBody) {
         return new ResponseEntity<>(httpErrorBody, httpErrorBody.getStatus());
